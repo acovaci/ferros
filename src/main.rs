@@ -8,6 +8,10 @@ use ferros::println;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
+    // ferros::init();
+
+    // x86_64::instructions::interrupts::int3();
+
     #[cfg(not(test))]
     main();
 
@@ -18,13 +22,26 @@ pub extern "C" fn _start() -> ! {
 }
 
 pub fn main() {
-    ferros::driver::vga::VGA_WRITER
-        .lock()
-        .set_foreground(ferros::driver::vga::Color::Bright(
-            ferros::driver::vga::ColorName::Green,
-        ));
-    for i in 0..100 {
-        println!("line {}", i)
+    println!(
+        "{:#?}",
+        ferros::nucleus::interrupt::idt::INTERRUPT_DESCRIPTOR_TABLE.entries
+            [ferros::nucleus::interrupt::idt::InterruptDescriptorTableIndex::DivisionError
+                as usize]
+    );
+
+    ferros::nucleus::interrupt::idt::INTERRUPT_DESCRIPTOR_TABLE.load();
+    // println!("Loaded IDT");
+
+    divide_by_zero();
+}
+
+fn divide_by_zero() {
+    unsafe {
+        core::arch::asm!(
+            "mov dx, 0",
+            "div dx",
+            options(nostack, nomem, preserves_flags)
+        );
     }
 }
 

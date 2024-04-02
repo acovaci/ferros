@@ -1,18 +1,24 @@
 #![no_std]
 #![cfg_attr(test, no_main)]
+#![feature(abi_x86_interrupt)]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::libs::testing::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
 pub mod driver;
 pub mod libs;
+pub mod nucleus;
 
+#[cfg(test)]
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    #[cfg(test)]
+    // init();
     test_main();
-
     loop {}
+}
+
+pub fn init() {
+    crate::nucleus::interrupt::init_idt();
 }
 
 #[cfg(test)]
