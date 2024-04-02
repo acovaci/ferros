@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+rustup override set nightly
+rustup component add llvm-tools-preview
